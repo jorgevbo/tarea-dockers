@@ -1,5 +1,5 @@
 # Se utiliza la imagen de apache generada previamente
-FROM jorgevbo/tarea-apache2
+FROM jorgevbo/tarea-apache
 
 # Se instala PHP y el mod_php para Apache
 RUN apt-get install -y php \
@@ -24,7 +24,8 @@ RUN cd /var/www/html/grav && \
     bin/grav install && \
     bin/gpm install admin -y
 
-# RUN chown -R www-data:www-data /var/www/html
+# Cambiamos el owner de la carpeta html por el usuario configurado para Apache
+RUN chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP /var/www/html
 
 # Agregamos un archivo de configuración de Sitio para la aplicación
 ADD grav-site.conf /etc/apache2/sites-available/grav-site.conf
@@ -32,5 +33,3 @@ ADD grav-site.conf /etc/apache2/sites-available/grav-site.conf
 # Deshabilitamos el sitio por defecto de Apache y habilitamos el de Grav
 RUN a2dissite 000-default && \
     a2ensite grav-site
-
-# CMD ["/usr/sbin/apache2", "-D",  "FOREGROUND"]
